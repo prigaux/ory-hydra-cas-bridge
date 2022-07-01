@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "module": "commonjs",
+    "types": ["node"],
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true
+  }
+}
