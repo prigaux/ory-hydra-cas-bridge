@@ -1,5 +1,5 @@
 import express from 'express'
-import { cas_server_base_url, hydraAdmin, our_base_url } from './config'
+import { cas_server_base_url, hydraAdmin, our_base_url, supann_to_oidc_attr } from './config'
 import { handle_error, casv2_validate_ticket } from './helpers'
 
 
@@ -8,18 +8,19 @@ const router = express.Router()
 router.get('/login', handle_error(async (req, res) => {
     const challenge = String(req.query.login_challenge)
     if (!challenge) throw new Error('Expected a login challenge')
+
+    const { data: loginRequest } = await hydraAdmin.getLoginRequest(challenge) // needed?
     
     const ourUrl = our_base_url + '/login?login_challenge=' + encodeURIComponent(challenge)
     if (!req.query.ticket) {
         res.redirect(cas_server_base_url + "/login?service=" + encodeURIComponent(ourUrl))
     } else {
-        const { data: loginRequest } = await hydraAdmin.getLoginRequest(challenge) // needed?
         
-        const cas_response = await casv2_validate_ticket(ourUrl, String(req.query.ticket))
+        const cas_response = await casv2_validate_ticket(supann_to_oidc_attr, ourUrl, String(req.query.ticket))
 
         // tell hydra:
         const { data: acceptResp } = await hydraAdmin.acceptLoginRequest(challenge, { 
-            subject: cas_response.subject,
+            subject: String(cas_response.subject),
             context: cas_response,
         })
         // redirect the user back to hydra
@@ -39,8 +40,7 @@ router.get('/consent', handle_error(async (req, res) => {
             grant_access_token_audience: consentRequest.requested_access_token_audience,
 
             session: {
-              // @ts-ignore
-              id_token: { email: consentRequest.context?.email },
+              id_token: consentRequest.context,
             }
     })
     // redirect the user back to hydra!

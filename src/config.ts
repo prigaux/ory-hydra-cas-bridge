@@ -1,4 +1,5 @@
 import { AdminApi, Configuration } from '@oryd/hydra-client'
+import { to_oidc_attr } from './helpers'
 
 const baseOptions: any = {}
 
@@ -15,3 +16,18 @@ export const hydraAdmin = new AdminApi(
 
 export const our_base_url = 'https://oidc.univ.fr/hydra-cas-bridge'
 export const cas_server_base_url = 'https://cas.univ.fr/cas'
+
+// https://wiki.refeds.org/display/GROUPS/Mapping+SAML+attributes+to+OIDC+Claims
+export const supann_to_oidc_attr: to_oidc_attr = {
+    mono: {
+        user: "subject",
+        mail: "email",
+        givenName: "given_name",
+        sn: "family_name",
+        displayName: "preferred_username",
+    },
+    multi: {
+        eduPersonAffiliation: "eduperson_affiliation",
+    },
+}
+
