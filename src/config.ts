@@ -1,4 +1,4 @@
-import { AdminApi, Configuration } from '@oryd/hydra-client'
+import { OAuth2Api, Configuration } from '@ory/hydra-client'
 import { to_oidc_attr } from './helpers'
 
 const baseOptions: any = {}
@@ -7,7 +7,7 @@ if (process.env.MOCK_TLS_TERMINATION) {
   baseOptions.headers = { 'X-Forwarded-Proto': 'https' }
 }
 
-export const hydraAdmin = new AdminApi(
+export const hydraAdmin = new OAuth2Api(
   new Configuration({
     basePath: 'http://127.0.0.1:4445',
     baseOptions
